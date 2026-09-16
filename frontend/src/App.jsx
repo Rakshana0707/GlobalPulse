@@ -14,6 +14,7 @@ export default function App() {
   const [error, setError] = useState('');
 
   const [sentimentData, setSentimentData] = useState(null);
+  const [activeFilter, setActiveFilter] = useState('');
 
   // Fetch data function
   const loadDashboardData = async (silent = false) => {
@@ -203,8 +204,24 @@ export default function App() {
                     const neuPct = (data.neutral / data.total) * 100;
 
                     return (
-                      <div key={name} style={{ display: 'grid', gridTemplateColumns: '120px 60px 1fr', alignItems: 'center', gap: '1rem' }}>
-                        <span style={{ fontWeight: 600, textTransform: 'capitalize' }}>{name}</span>
+                      <div 
+                        key={name} 
+                        onClick={() => setActiveFilter(activeFilter === name ? '' : name)}
+                        style={{ 
+                          display: 'grid', 
+                          gridTemplateColumns: '120px 60px 1fr', 
+                          alignItems: 'center', 
+                          gap: '1rem',
+                          cursor: 'pointer',
+                          padding: '0.5rem',
+                          borderRadius: '6px',
+                          backgroundColor: activeFilter === name ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
+                          border: activeFilter === name ? '1px solid var(--color-highlight)' : '1px solid transparent',
+                          transition: 'var(--transition-smooth)'
+                        }}
+                        title={`Click to filter table by ${name}`}
+                      >
+                        <span style={{ fontWeight: 600, textTransform: 'capitalize', color: activeFilter === name ? 'var(--color-highlight)' : 'var(--text-primary)' }}>{name}</span>
                         <span style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>{data.total} hits</span>
                         
                         {/* Proportional Stacked Progress Bar */}
@@ -254,7 +271,8 @@ export default function App() {
           {/* Source Article Database table card */}
           <ArticleTable 
             articles={articles} 
-            onAddArticle={handleAddArticle} 
+            onAddArticle={handleAddArticle}
+            activeFilter={activeFilter}
           />
         </div>
 

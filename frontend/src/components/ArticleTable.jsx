@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Search, Eye, X, Cpu, MapPin, Building } from 'lucide-react';
 import { extractEntitiesFromText } from '../api';
 
-export default function ArticleTable({ articles = [], onAddArticle }) {
+export default function ArticleTable({ articles = [], onAddArticle, activeFilter = '' }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedArticle, setSelectedArticle] = useState(null);
   const [extractedEntities, setExtractedEntities] = useState(null);
@@ -13,10 +13,18 @@ export default function ArticleTable({ articles = [], onAddArticle }) {
   const [showAddForm, setShowAddForm] = useState(false);
 
   // Search logic filter
-  const filteredArticles = articles.filter(article => 
+  let filteredArticles = articles.filter(article => 
     article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (article.content && article.content.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  // Apply active dashboard entity filter if one is selected
+  if (activeFilter) {
+    const filterRegex = new RegExp(`\\b${activeFilter}\\b`, 'i');
+    filteredArticles = filteredArticles.filter(article => 
+      filterRegex.test(article.title) || (article.content && filterRegex.test(article.content))
+    );
+  }
 
   const handleViewArticle = async (article) => {
     setSelectedArticle(article);
@@ -51,6 +59,11 @@ export default function ArticleTable({ articles = [], onAddArticle }) {
           <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', fontWeight: 400 }}>
             ({filteredArticles.length} items)
           </span>
+          {activeFilter && (
+            <span className="badge" style={{ marginLeft: '0.75rem', backgroundColor: 'rgba(59, 130, 246, 0.2)', color: 'var(--color-highlight)', textTransform: 'capitalize' }}>
+              Filtered by: {activeFilter}
+            </span>
+          )}
         </h2>
         
         <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
